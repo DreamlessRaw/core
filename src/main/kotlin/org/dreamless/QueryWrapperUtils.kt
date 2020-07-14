@@ -224,7 +224,7 @@ object QueryWrapperUtils {
             val names = orderName.split(',')
             val sorts = orderSort.split(',')
             if (names.size == sorts.size) {
-                val ascStr: List<String> = listOf("ASC", "Asc", "asc")
+                val ascStr: List<String> = listOf("ASC", "Asc", "asc","ascend")
                 for ((i, v) in names.withIndex()) {
                     var field: String = ""
                     val arr = v.split("(?<!^)(?=[A-Z])".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
