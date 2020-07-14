@@ -23,14 +23,15 @@ object QueryWrapperUtils {
         //组装排序
         val orders = orders(searchModel.name, searchModel.sort)
         if (orders.count() > 0) {
-            orders.forEach { queryWrapper.orderBy(true, it.key, it.value) }
+            orders.forEach { queryWrapper.orderBy(true, it.value, it.key) }
         }
         //组装条件
         if (searchModel.info.count() > 0) {
 
             searchModel.info.map {
                 it.items.map { m ->
-                    val strArr = m.field.split("(?<!^)(?=[A-Z])".toRegex()).dropLastWhile { d -> d.isEmpty() }.toTypedArray()
+                    val strArr =
+                        m.field.split("(?<!^)(?=[A-Z])".toRegex()).dropLastWhile { d -> d.isEmpty() }.toTypedArray()
                     when (strArr.size) {
                         1 -> {
                             m.field = strArr[0]
@@ -120,13 +121,16 @@ object QueryWrapperUtils {
                                 it.or().notIn(v.field, v.value)
                             }
                             Method.Day.value() -> {
-                                it.or().ge(v.field, DateTimeUtils.getStartOfDayToString()).le(v.field, DateTimeUtils.getEndOfDayToString())
+                                it.or().ge(v.field, DateTimeUtils.getStartOfDayToString())
+                                    .le(v.field, DateTimeUtils.getEndOfDayToString())
                             }
                             Method.Week.value() -> {
-                                it.or().ge(v.field, DateTimeUtils.getStartOfWeekToString()).le(v.field, DateTimeUtils.getEndOfWeekToString())
+                                it.or().ge(v.field, DateTimeUtils.getStartOfWeekToString())
+                                    .le(v.field, DateTimeUtils.getEndOfWeekToString())
                             }
                             Method.Month.value() -> {
-                                it.or().ge(v.field, DateTimeUtils.getStartOfMonthToString()).le(v.field, DateTimeUtils.getEndOfMonthToString())
+                                it.or().ge(v.field, DateTimeUtils.getStartOfMonthToString())
+                                    .le(v.field, DateTimeUtils.getEndOfMonthToString())
                             }
                         }
                     }
@@ -183,13 +187,22 @@ object QueryWrapperUtils {
                                 it.notIn(v.field, v.value)
                             }
                             Method.Day.value() -> {
-                                it.and {i -> i.ge(v.field, DateTimeUtils.getStartOfDayToString()).le(v.field, DateTimeUtils.getEndOfDayToString()) }
+                                it.and { i ->
+                                    i.ge(v.field, DateTimeUtils.getStartOfDayToString())
+                                        .le(v.field, DateTimeUtils.getEndOfDayToString())
+                                }
                             }
                             Method.Week.value() -> {
-                                it.and {i -> i.ge(v.field, DateTimeUtils.getStartOfWeekToString()).le(v.field, DateTimeUtils.getEndOfWeekToString()) }
+                                it.and { i ->
+                                    i.ge(v.field, DateTimeUtils.getStartOfWeekToString())
+                                        .le(v.field, DateTimeUtils.getEndOfWeekToString())
+                                }
                             }
                             Method.Month.value() -> {
-                                it.and {i -> i.ge(v.field, DateTimeUtils.getStartOfMonthToString()).le(v.field, DateTimeUtils.getEndOfMonthToString()) }
+                                it.and { i ->
+                                    i.ge(v.field, DateTimeUtils.getStartOfMonthToString())
+                                        .le(v.field, DateTimeUtils.getEndOfMonthToString())
+                                }
                             }
                         }
                     }
@@ -202,11 +215,11 @@ object QueryWrapperUtils {
      * 排序
      * @param orderName:排序字段,用逗号","隔开
      * @param orderSort:排序方式,用逗号","隔开
-     * @return orders:isAsc,column
+     * @return orders:column,isAsc
      */
-    private fun orders(orderName: String, orderSort: String): MutableMap<Boolean, String> {
+    private fun orders(orderName: String, orderSort: String): MutableMap<String, Boolean> {
         //如果存在排序,则加入排序
-        val orders = mutableMapOf<Boolean, String>()
+        val orders = mutableMapOf<String, Boolean>()
         if (orderName.isNotEmpty() && orderSort.isNotEmpty()) {
             val names = orderName.split(',')
             val sorts = orderSort.split(',')
@@ -226,7 +239,7 @@ object QueryWrapperUtils {
                             field = "${arr[0]}_${arr[1].toLowerCase()}_${arr[2].toLowerCase()}"
                         }
                     }
-                    orders[ascStr.contains(sorts[i])] = field
+                    orders[field] = ascStr.contains(sorts[i])
                 }
                 return orders
             } else {

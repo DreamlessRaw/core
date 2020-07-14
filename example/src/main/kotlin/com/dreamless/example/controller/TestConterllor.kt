@@ -2,7 +2,7 @@ package com.dreamless.example.controller
 
 import com.baomidou.mybatisplus.core.metadata.IPage
 import com.dreamless.example.entity.Test
-import com.dreamless.example.mapper.TestDao
+import com.dreamless.example.mapper.TestMapper
 import org.dreamless.ApiResult
 import org.dreamless.SearchModel
 import org.springframework.web.bind.annotation.PostMapping
@@ -16,17 +16,17 @@ import javax.annotation.Resource
 class TestController {
 
     @Resource
-    lateinit var testDao: TestDao
+    lateinit var testMapper: TestMapper
 
     @PostMapping("add")
     fun add() {
         for (i in 1..1000) {
-            testDao.insert(Test(i.toString(), "${i}号"))
+            testMapper.insert(Test(i.toString(), "${i}号"))
         }
     }
 
     @PostMapping("query")
     fun query(@RequestBody searchModel: SearchModel<Test>): ApiResult<IPage<Test>> {
-        return ApiResult.success(testDao.selectPage(searchModel.page, searchModel.queryWrapper()))
+        return ApiResult.success(testMapper.paged(searchModel.page, searchModel.queryWrapper()))
     }
 }
